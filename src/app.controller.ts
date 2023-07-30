@@ -13,7 +13,7 @@ export class NoteController {
   }
 
   @Get(':id')
-  getNoteById(@Param('id') id: number) {
+  getNoteById(@Param('id') id: string) {
     return this.noteService.getNoteById(id);
   }
 
@@ -23,18 +23,13 @@ export class NoteController {
   }
 
   @Patch(':id')
-  editNote(@Param('id') id: number, @Body() updateNoteDto: UpdateNoteDto) {
+  editNote(@Param('id') id: string, @Body() updateNoteDto: UpdateNoteDto) {
     return this.noteService.editNote(id, updateNoteDto);
   }
 
   @Delete(':id')
-  removeNote(@Param('id') id: number) {
+  removeNote(@Param('id') id: string) {
     return this.noteService.removeNoteById(id);
-  }
-
-  @Get('hello')
-  getHello(): string {
-    return 'Hello World!';
   }
 }
 

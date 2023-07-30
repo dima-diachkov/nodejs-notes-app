@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { Note } from './app.interface';
 import { CreateNoteDto, UpdateNoteDto } from './app.dto';
 import { validate } from 'class-validator';
@@ -12,8 +12,13 @@ export class NoteService {
     return this.notes;
   }
 
-  getNoteById(id: number): Note {
-    return this.notes.find((note) => note.id === id);
+  getNoteById(id: string): Note {
+    const noteId = parseInt(id, 10);
+    const note = this.notes.find((note) => note.id === noteId);
+    if (!note) {
+      throw new NotFoundException(`Note with ID ${id} not found`);
+    }
+    return note;
   }
 
   async createNote(createNoteDto: CreateNoteDto): Promise<Note> {
@@ -34,13 +39,14 @@ export class NoteService {
     return newNote;
   }
 
-  async editNote(id: number, updateNoteDto: UpdateNoteDto): Promise<Note> {
-    const index = this.notes.findIndex((note) => note.id === id);
+  async editNote(id: string, updateNoteDto: UpdateNoteDto): Promise<Note> {
+    const noteId = parseInt(id, 10);
+    const index = this.notes.findIndex((note) => note.id === noteId);
     if (index >= 0) {
       const updatedNote: Note = {
         ...this.notes[index],
         ...updateNoteDto,
-        id,
+        id: noteId,
       };
 
       const errors = await validate(updatedNote);
@@ -50,11 +56,13 @@ export class NoteService {
 
       this.notes[index] = updatedNote;
       return updatedNote;
+    } else {
+      throw new NotFoundException(`Note with ID ${id} not found`);
     }
-    return null;
-  }
+  } 
 
-  removeNoteById(id: number): void {
-    this.notes = this.notes.filter((note) => note.id !== id);
+  removeNoteById(id: string): void {
+    const noteId = parseInt(id, 10);
+    this.notes = this.notes.filter((note) => note.id !== noteId);
   }
 }
