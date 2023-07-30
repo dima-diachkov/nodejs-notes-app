@@ -25,10 +25,8 @@ export class NoteService {
       archived: createNoteDto.archived || false,
     };
 
-    const errors = await validate(newNote); // Validate the new note object
-
+    const errors = await validate(newNote);
     if (errors.length > 0) {
-      // If validation fails, throw a BadRequestException with validation errors
       throw new BadRequestException(errors);
     }
 
@@ -45,10 +43,8 @@ export class NoteService {
         id,
       };
 
-      const errors = await validate(updatedNote); // Validate the updated note object
-
+      const errors = await validate(updatedNote);
       if (errors.length > 0) {
-        // If validation fails, throw a BadRequestException with validation errors
         throw new BadRequestException(errors);
       }
 

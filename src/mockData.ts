@@ -1,5 +1,3 @@
-// mockData.ts
-
 export const mockNotes = [
     {
       id: 1,
