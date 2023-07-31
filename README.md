@@ -24,7 +24,7 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+A simple note-taking application built with NestJS, a progressive Node.js framework for building efficient and scalable server-side applications. This application allows users to create, view, edit, and delete notes. Each note has a timestamp, content, category, and an option to mark it as archived.
 
 ## Installation
 
@@ -45,28 +45,61 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
-## Test
+## Endpoints
 
-```bash
-# unit tests
-$ npm run test
+### Get All Notes
+**URL:** `/notes`   
+**Method:** `GET`   
+**Description:** Retrieve all notes.  
+**Response:** Array of all notes.   
 
-# e2e tests
-$ npm run test:e2e
+### Get Note by ID
+**URL:** `/notes/:id`   
+**Method:** `GET`   
+**Description:** Retrieve a specific note by its ID.  
+**Response:** Note object with the specified ID.  
 
-# test coverage
-$ npm run test:cov
+### Create New Note
+**URL:** `/notes`  
+**Method:** `POST`  
+**Description:** Create a new note.  
+**Request Body:**  
+```json
+{
+  "time": "2023-07-30T10:00:00Z",
+  "content": "Complete project proposal",
+  "category": "Task",
+  "archived": false
+}
+```
+### Edit Note
+**URL:** `/notes/:id`   
+**Method:** `PATCH`  
+**Description:** Edit an existing note by its ID.  
+**Request Body:**  
+```json
+{
+  "time": "2023-07-30T11:30:00Z",
+  "content": "Completed project proposal",
+  "category": "Task",
+  "archived": true
+}
+```
+### Delete Note
+**URL:** /notes/:id   
+**Method:** DELETE  
+**Description:** Delete a note by its ID.  
+**Request Body:** Success message.   
+
+```json
+{
+  "message": "Note with ID 1 has been deleted successfully."
+}
 ```
 
 ## Support
 
 Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
 
 ## License
 
