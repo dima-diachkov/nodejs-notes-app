@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  node-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: node-server
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+    command: npm start
+
+  postgres-db:
+    image: postgres:latest
+    container_name: postgres-db
+    restart: always
+    environment:
+      POSTGRES_USER: your_username
+      POSTGRES_PASSWORD: your_password
+      POSTGRES_DB: your_database_name
+    ports:
+      - "5432:5432"
+    volumes:
+      - /path/to/your/postgres/data:/var/lib/postgresql/data
+      
