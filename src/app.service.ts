@@ -1,7 +1,7 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { Note } from './app.interface';
 import { CreateNoteDto, UpdateNoteDto } from './app.dto';
-import { validate } from 'class-validator';
+import { validate, ValidatorOptions } from 'class-validator';
 import { mockNotes } from './mockData';
 
 @Injectable()
@@ -30,7 +30,9 @@ export class NoteService {
       archived: createNoteDto.archived || false,
     };
 
-    const errors = await validate(newNote);
+    const validatorOptions: ValidatorOptions = { groups: ['create'] };
+    const errors = await validate(newNote, validatorOptions);
+
     if (errors.length > 0) {
       throw new BadRequestException(errors);
     }
@@ -49,7 +51,9 @@ export class NoteService {
         id: noteId,
       };
 
-      const errors = await validate(updatedNote);
+      const validatorOptions: ValidatorOptions = { groups: ['update'] };
+      const errors = await validate(updatedNote, validatorOptions);
+
       if (errors.length > 0) {
         throw new BadRequestException(errors);
       }
@@ -59,7 +63,7 @@ export class NoteService {
     } else {
       throw new NotFoundException(`Note with ID ${id} not found`);
     }
-  } 
+  }
 
   removeNoteById(id: string): void {
     const noteId = parseInt(id, 10);
