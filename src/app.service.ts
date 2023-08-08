@@ -1,20 +1,21 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
-import { Note } from './app.interface';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/sequelize';
 import { CreateNoteDto, UpdateNoteDto } from './app.dto';
-import { validate, ValidatorOptions } from 'class-validator';
-import { mockNotes } from './mockData';
+import { Note } from './note.model';
 
 @Injectable()
 export class NoteService {
-  private notes: Note[] = [...mockNotes];
+  constructor(
+    @InjectModel(Note)
+    private readonly noteModel: typeof Note,
+  ) {}
 
-  getAllNotes(): Note[] {
-    return this.notes;
+  async getAllNotes(): Promise<Note[]> {
+    return this.noteModel.findAll();
   }
 
-  getNoteById(id: string): Note {
-    const noteId = parseInt(id, 10);
-    const note = this.notes.find((note) => note.id === noteId);
+  async getNoteById(id: string): Promise<Note> {
+    const note = await this.noteModel.findByPk(id);
     if (!note) {
       throw new NotFoundException(`Note with ID ${id} not found`);
     }
@@ -22,51 +23,28 @@ export class NoteService {
   }
 
   async createNote(createNoteDto: CreateNoteDto): Promise<Note> {
-    const newNote: Note = {
-      id: Date.now(),
-      time: createNoteDto.time,
-      content: createNoteDto.content,
-      category: createNoteDto.category,
+    const newNote = this.noteModel.build({
+      ...createNoteDto,
       archived: createNoteDto.archived || false,
-    };
+    });
 
-    const validatorOptions: ValidatorOptions = { groups: ['create'] };
-    const errors = await validate(newNote, validatorOptions);
+    await newNote.save();
 
-    if (errors.length > 0) {
-      throw new BadRequestException(errors);
-    }
-
-    this.notes.push(newNote);
     return newNote;
   }
 
   async editNote(id: string, updateNoteDto: UpdateNoteDto): Promise<Note> {
-    const noteId = parseInt(id, 10);
-    const index = this.notes.findIndex((note) => note.id === noteId);
-    if (index >= 0) {
-      const updatedNote: Note = {
-        ...this.notes[index],
-        ...updateNoteDto,
-        id: noteId,
-      };
-
-      const validatorOptions: ValidatorOptions = { groups: ['update'] };
-      const errors = await validate(updatedNote, validatorOptions);
-
-      if (errors.length > 0) {
-        throw new BadRequestException(errors);
-      }
-
-      this.notes[index] = updatedNote;
-      return updatedNote;
-    } else {
+    const [_, [updatedNote]] = await this.noteModel.update(updateNoteDto, {
+      where: { id },
+      returning: true,
+    });
+    if (!updatedNote) {
       throw new NotFoundException(`Note with ID ${id} not found`);
     }
+    return updatedNote;
   }
 
-  removeNoteById(id: string): void {
-    const noteId = parseInt(id, 10);
-    this.notes = this.notes.filter((note) => note.id !== noteId);
+  async removeNoteById(id: string): Promise<void> {
+    await this.noteModel.destroy({ where: { id } });
   }
 }
