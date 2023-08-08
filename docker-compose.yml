@@ -14,6 +14,8 @@ services:
     command: npm start
     env_file:
       - .env
+    depends_on:
+      - postgres-db
 
   postgres-db:
     image: postgres:latest
@@ -27,5 +29,6 @@ services:
       - "5432:5432"
     volumes:
       - /path/to/your/postgres/data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     env_file:
       - .env
